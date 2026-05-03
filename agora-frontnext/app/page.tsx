@@ -25,7 +25,7 @@ export default function HomePage() {
             Login
           </Link>
           <Link 
-            href="/register" 
+            href="/registrar" 
             className="px-5 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition shadow-md flex items-center"
           >
             Registrar
