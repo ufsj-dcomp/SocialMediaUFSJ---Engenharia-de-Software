@@ -8,6 +8,8 @@ exports.up = function(knex) {
     table.string('foto');
     table.boolean('eh_perfil_completo').defaultTo(false);
     table.timestamps(true, true);
+    table.boolean('eh_administrador_geral').defaultTo(false);
+    table.boolean('eh_administrador_curso').defaultTo(false);
   });
 };
 
