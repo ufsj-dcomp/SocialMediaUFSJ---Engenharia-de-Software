@@ -3,16 +3,33 @@ import { NextResponse } from "next/server"
 
 export default withAuth(
   function middleware(req) {
-    const estaLogado = !!req.nextauth.token;
-    const ehPerfilCompleto = req.nextauth.token?.eh_perfil_completo;
-    const ehCaminhoCompletarPerfil = req.nextUrl.pathname.startsWith("/completarPerfil");
+    const token = req.nextauth.token;
+    const estaLogado = !!token;
+    
+    const ehPerfilCompleto = token?.eh_perfil_completo;
+    const ehAlgumAdministrador = token?.eh_administrador_geral || token?.eh_administrador_curso;
+    const roleSelecionado = token?.role_selecionado;
+    
+    const pathCompletar = "/completarPerfil";
+    const pathSelecionar = "/selecionarPerfil";
+    
+    const ehPathCompletar = req.nextUrl.pathname === pathCompletar;
+    const ehPathSelecionar = req.nextUrl.pathname === pathSelecionar;
 
-    if (estaLogado && !ehPerfilCompleto && !ehCaminhoCompletarPerfil) {
-      return NextResponse.redirect(new URL("/completarPerfil", req.url));
+    if (estaLogado && !ehPerfilCompleto && !ehPathCompletar) {
+      console.log(token.eh_administrador_geral);
+      return NextResponse.redirect(new URL(pathCompletar, req.url));
     }
 
-    //ainda tenho que saber para onde mandar o cara depois de completar o perfil
-    if (estaLogado && ehPerfilCompleto && ehCaminhoCompletarPerfil) {
+    if (estaLogado && ehPerfilCompleto && ehPathCompletar) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    if (estaLogado && ehPerfilCompleto && ehAlgumAdministrador && !roleSelecionado && !ehPathSelecionar) {
+      return NextResponse.redirect(new URL(pathSelecionar, req.url));
+    }
+
+    if (estaLogado && ehPerfilCompleto && roleSelecionado && ehPathSelecionar) {
       return NextResponse.redirect(new URL("/", req.url));
     }
   },
@@ -23,7 +40,6 @@ export default withAuth(
   }
 )
 
-//Rotas de exemplo (feed, perfil, grupos), ainda não é definitivo.
 export const config = {
-  matcher: ["/feed/:path*", "/perfil/:path*", "/grupos/:path*", "/completarPerfil"],
+  matcher: ["/", "/feed/:path*", "/perfil/:path*", "/completar-perfil", "/selecionar-perfil"],
 }
