@@ -1,4 +1,7 @@
-const routerTeste = require("./testeRota");
+const usuariosRotas = require("./usuariosRotas");
+const cursosRotas = require("./cursosRotas");
+
 module.exports = (app) => {
-    app.use(routerTeste);
+    app.use(usuariosRotas);
+    app.use(cursosRotas);
 }
