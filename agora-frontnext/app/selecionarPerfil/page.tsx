@@ -14,7 +14,11 @@ export default function SelecionarPerfilPage() {
 
   const escolherPerfil = async (role: string) => {
     await update({ role_selecionado: role });
-    router.push('/');
+    if(role == "ADMIN_GERAL"){
+       router.push('/administradorGeral'); 
+    }else{
+        router.push('/');
+    }
   }
 
   return (
@@ -52,7 +56,7 @@ export default function SelecionarPerfilPage() {
                 <BookOpen size={24} />
               </div>
               <div>
-                <span className="block text-lg">Coordenador do Curso</span>
+                <span className="block text-lg">Administrador de Curso</span>
                 <span className="text-xs font-normal opacity-80">Gerencie turmas, professores e avisos</span>
               </div>
             </button>

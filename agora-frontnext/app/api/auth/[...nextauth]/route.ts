@@ -23,6 +23,7 @@ callbacks: {
           token.eh_perfil_completo = data.eh_perfil_completo;
           token.eh_administrador_geral = data.eh_administrador_geral;
           token.eh_administrador_curso = data.eh_administrador_curso;
+          token.foto = data.foto;
           
           if (!data.eh_administrador_geral && !data.eh_administrador_curso) {
               token.role_selecionado = 'ESTUDANTE';
@@ -47,6 +48,7 @@ callbacks: {
         session.user.eh_administrador_geral = token.eh_administrador_geral;
         session.user.eh_administrador_curso = token.eh_administrador_curso;
         session.user.role_selecionado = token.role_selecionado;
+        session.user.foto = token.foto;
       }
       return session;
     }
