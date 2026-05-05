@@ -11,7 +11,7 @@ export default function RegisterPage() {
       <div className="absolute top-6 left-6">
         <Link href="/" className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition font-medium">
           <ArrowLeft size={20} />
-          Voltar para Home
+          Voltar para Home Teste.
         </Link>
       </div>
 
