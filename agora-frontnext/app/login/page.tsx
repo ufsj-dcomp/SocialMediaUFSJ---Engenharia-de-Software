@@ -33,7 +33,7 @@ function LoginContent() {
       <div className="flex flex-col gap-4">
         <button 
           type="button"
-          onClick={() => signIn('google', { callbackUrl: '/' })}
+          onClick={() => signIn('google', { callbackUrl: '/selecionarPerfil' })}
           className="w-full flex items-center justify-center gap-3 bg-white text-slate-700 font-semibold py-3 px-4 rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition shadow-sm"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5">

@@ -36,6 +36,7 @@ export default function CompletarPage() {
     }
     buscarCursos()
     }, [])
+    
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -124,7 +125,7 @@ export default function CompletarPage() {
                 type="text" 
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
-                placeholder="ex: davy_salgado"
+                placeholder="ex: primeiroNome_ultimoNome" //ia colocar um exemplo dinamico, mas deixa pra depois, deu problema com o ggoogle
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition"
               />
             </div>

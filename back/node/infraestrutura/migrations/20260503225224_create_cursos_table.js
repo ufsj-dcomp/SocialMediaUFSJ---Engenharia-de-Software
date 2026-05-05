@@ -5,5 +5,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable('cursos');
+  return knex.schema.dropTableIfExists('cursos');
 };

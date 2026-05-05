@@ -1,7 +1,6 @@
 exports.up = function(knex) {
   return knex.schema.createTable('usuario', table => {
-    table.increments('id').primary();
-    table.string('email').notNullable().unique();
+    table.string('email').notNullable().primary();
     table.string('nome').notNullable();
     table.string('nome_usuario').unique();
     table.string('curso');
@@ -13,6 +12,7 @@ exports.up = function(knex) {
   });
 };
 
-exports.down = function(knex) {
-  return knex.schema.dropTable('usuario');
+exports.down = async function(knex) {
+  await knex.schema.dropTableIfExists('administrador_curso_relacao');
+  await knex.schema.dropTableIfExists('usuario');
 };
