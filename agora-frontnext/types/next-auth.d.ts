@@ -8,6 +8,7 @@ declare module "next-auth" {
       eh_administrador_geral?: boolean;
       eh_administrador_curso?: boolean;
       role_selecionado?: string | null;
+      foto?: string | null;
     } & DefaultSession["user"]
   }
 
@@ -16,6 +17,7 @@ declare module "next-auth" {
     eh_administrador_geral?: boolean;
     eh_administrador_curso?: boolean;
     role_selecionado?: string | null;
+    foto?: string | null;
   }
 }
 
@@ -25,5 +27,6 @@ declare module "next-auth/jwt" {
     eh_administrador_geral?: boolean;
     eh_administrador_curso?: boolean;
     role_selecionado?: string | null;
+    foto?: string | null;
   }
 }

@@ -63,6 +63,52 @@ router.get("/api/usuario/estudantes", async (req, res) => {
     }
 });
 
+router.post("/api/usuario/promover-administrador-curso", async (req, res) => {
+    const { email, curso } = req.body;
+
+    if (!email || !curso) {
+        return res.status(400).json({ error: "E-mail e curso são obrigatórios." });
+    }
+
+    try {
+        await db.transaction(async (trx) => {
+
+            await trx('usuario')
+                .where({ email: email })
+                .update({ eh_administrador_curso: 1 });
+
+            const relacaoExiste = await trx('administrador_curso_relacao')
+                .where({ 
+                    email: email, 
+                    curso_nome: curso 
+                }).first();
+
+            if (!relacaoExiste) {
+                await trx('administrador_curso_relacao').insert({
+                    email: email,
+                    curso_nome: curso
+                });
+            }
+        });
+
+        res.status(200).json({ message: "Administrador de curso promovido com sucesso!" });
+
+    } catch (error) {
+        console.error("Erro ao promover admin de curso:", error);
+        
+        if (error.message === "USUARIO_NAO_ENCONTRADO") {
+            return res.status(404).json({ error: "Usuário não encontrado." });
+        }
+        
+        if (error.code === 'ER_NO_REFERENCED_ROW_2' || error.code === 'ER_NO_REFERENCED_ROW') {
+            return res.status(400).json({ error: "O curso selecionado não existe no banco de dados." });
+        }
+
+        res.status(500).json({ error: "Erro interno no servidor ao tentar promover o administrador." });
+    }
+});
+
+
 router.get("/api/usuario/:email", async (req, res) => {
     try {
         const user = await db('usuario').where({ email: req.params.email }).first();
@@ -71,7 +117,7 @@ router.get("/api/usuario/:email", async (req, res) => {
                 eh_perfil_completo: Boolean(user.eh_perfil_completo),
                 eh_administrador_geral: Boolean(user.eh_administrador_geral),
                 eh_administrador_curso: Boolean(user.eh_administrador_curso),
-                foto: user.foto // 2. CORREÇÃO: Enviando a foto para o NextAuth usar no Header!
+                foto: user.foto 
             });
         } else {
             res.json({ 
@@ -85,5 +131,6 @@ router.get("/api/usuario/:email", async (req, res) => {
         res.status(500).json({ error: "Erro interno" });
     }
 });
+
 
 module.exports = router;

@@ -30,7 +30,7 @@ export default withAuth(
       return NextResponse.redirect(new URL(pathSelecionar, req.url));
     }
 
-    if (pathAtual.startsWith("/administadorGeral") && roleSelecionado !== "ADMIN_GERAL") {
+    if (pathAtual.startsWith("/administradorGeral") && roleSelecionado !== "ADMIN_GERAL") {
       return NextResponse.redirect(new URL("/", req.url));
     }
   },
@@ -43,11 +43,10 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    "/", 
     "/feed/:path*", 
     "/perfil/:path*", 
     "/completarPerfil", 
     "/selecionarPerfil", 
-    "/administadorGeral/:path*"
+    "/administradorGeral/:path*"
   ],
 }
