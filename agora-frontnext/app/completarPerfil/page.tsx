@@ -68,8 +68,7 @@ export default function CompletarPage() {
 
         if (response.ok) {
             await update({ eh_perfil_completo: true })
-            //mesma coisa do middleware lá, saber onde lançar depois de completar o perfil
-            router.push('/')
+            router.push('/selecionarPerfil')
         }
     } catch (error) {
         console.error("Erro ao enviar perfil:", error)
