@@ -8,8 +8,9 @@ const db = knex(config.development);
 // Emais admin
 const emailsAdmins = [
     "davysalgado01@aluno.ufsj.edu.br",
-    "estermariasouza2005@aluno.ufsj.edu.vb",
-    "jmsilvapn@aluno.ufsj.edu.br"
+    "estermariasouza2005@aluno.ufsj.edu.br",
+    "jmsilvapn@aluno.ufsj.edu.br",
+    "mateusdeoliveirabritoo@aluno.ufsj.edu.br"
 ];
 
 async function definirAdmins() {
