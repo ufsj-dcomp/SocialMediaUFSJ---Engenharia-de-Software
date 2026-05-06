@@ -114,6 +114,8 @@ router.get("/api/usuario/:email", async (req, res) => {
         const user = await db('usuario').where({ email: req.params.email }).first();
         if (user) {
             res.json({ 
+                nome: user.nome, 
+                curso: user.curso, 
                 eh_perfil_completo: Boolean(user.eh_perfil_completo),
                 eh_administrador_geral: Boolean(user.eh_administrador_geral),
                 eh_administrador_curso: Boolean(user.eh_administrador_curso),
@@ -121,6 +123,8 @@ router.get("/api/usuario/:email", async (req, res) => {
             });
         } else {
             res.json({ 
+                nome: "",
+                curso: "",
                 eh_perfil_completo: false,
                 eh_administrador_geral: false,
                 eh_administrador_curso: false,
