@@ -32,6 +32,7 @@ export default function AdminGeralPage() {
   const [estudantes, setEstudantes] = useState<Estudante[]>([])
   const [adminsCurso, setAdminsCurso] = useState<AdminCurso[]>([])
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' })
+  const [dropdownAberto, setDropdownAberto] = useState(false);
 
   const buscarAdmins = async () => {
     try {
@@ -141,15 +142,47 @@ export default function AdminGeralPage() {
       </aside>
 
       <main className="flex-1 flex flex-col">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 gap-4 shrink-0">
-          <div className="flex items-center gap-3 cursor-pointer group">
-            <span className="text-sm font-medium text-slate-700 group-hover:text-indigo-600 transition">Perfil</span>
-            <img 
-              src={session?.user?.foto || session?.user?.image || '/default-avatar.png'}
-              alt="Avatar do Usuário" 
-              className="w-10 h-10 rounded-full border-2 border-indigo-100 object-cover"
-            />
-            <ChevronDown size={16} className="text-slate-400" />
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 gap-4 shrink-0 relative">
+          <div 
+            className="relative"
+            onBlur={() => setTimeout(() => setDropdownAberto(false), 200)} // Fecha ao clicar fora
+          >
+            <div 
+              onClick={() => setDropdownAberto(!dropdownAberto)}
+              className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-slate-50 rounded-lg transition"
+            >
+              <span className="text-sm font-medium text-slate-700 group-hover:text-indigo-600 transition">
+                {session?.user?.name?.split(' ')[0] || 'Perfil'}
+              </span>
+              <img 
+                src={session?.user?.foto || session?.user?.image || '/default-avatar.png'}
+                alt="Avatar" 
+                className="w-10 h-10 rounded-full border-2 border-indigo-100 object-cover"
+              />
+              <ChevronDown size={16} className={`text-slate-400 transition-transform ${dropdownAberto ? 'rotate-180' : ''}`} />
+            </div>
+
+            {/* Menu Dropdown */}
+            {dropdownAberto && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg shadow-slate-200/50 py-2 z-50 animate-in fade-in zoom-in duration-150">
+                <button
+                  onClick={() => router.push('/edicaoPerfil')}
+                  className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition flex items-center gap-2"
+                >
+                  <Users size={16} />
+                  Editar Perfil
+                </button>
+                
+                <div className="border-t border-slate-100 my-1"></div>
+                
+                <button
+                  onClick={() => {/* Sua lógica de logout aqui */}}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+                >
+                  Sair da Conta
+                </button>
+              </div>
+            )}
           </div>
         </header>
 

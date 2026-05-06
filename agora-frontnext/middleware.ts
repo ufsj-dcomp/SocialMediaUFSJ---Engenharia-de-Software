@@ -13,6 +13,7 @@ export default withAuth(
     const pathCompletar = "/completarPerfil";
     const pathSelecionar = "/selecionarPerfil";
     const pathAdmin = "/administradorGeral";
+    const pathEdicao = "/edicaoPerfil";
     const pathAtual = req.nextUrl.pathname; 
 
     const ehPathCompletar = pathAtual === pathCompletar;
@@ -47,6 +48,7 @@ export const config = {
     "/perfil/:path*", 
     "/completarPerfil", 
     "/selecionarPerfil", 
-    "/administradorGeral/:path*"
+    "/administradorGeral/:path*",
+    "/edicaoPerfil/:path*"
   ],
 }
