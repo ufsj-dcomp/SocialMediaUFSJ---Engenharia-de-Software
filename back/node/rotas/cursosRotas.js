@@ -16,4 +16,28 @@ router.get("/api/cursos", async (req, res) => {
     }
 });
 
+router.post('/', async (req, res) => {
+    const { nome } = req.body;
+
+    if (!nome || nome.trim() === '') {
+        return res.status(400).json({ erro: 'O nome do curso é obrigatório.' });
+    }
+
+    try {
+        const cursoExistente = await db('cursos').where({ nome }).first();
+        
+        if (cursoExistente) {
+            return res.status(409).json({ erro: 'Já existe um curso cadastrado com este nome.' });
+        }
+
+        await db('cursos').insert({ nome });
+
+        return res.status(201).json({ mensagem: 'Curso cadastrado com sucesso' });
+
+    } catch (erro) {
+        console.error('Erro ao cadastrar curso:', erro);
+        return res.status(500).json({ erro: 'Erro interno no servidor ao tentar criar o curso.' });
+    }
+});
+
 module.exports = router;
