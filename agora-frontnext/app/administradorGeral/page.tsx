@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { UserPlus, ShieldCheck, ChevronDown, Users } from 'lucide-react'
+import { UserPlus, ShieldCheck, ChevronDown, Users, BookOpen } from 'lucide-react'
 
 interface Curso {
+  id?: number; 
   nome: string;
 }
 
@@ -31,7 +32,19 @@ export default function AdminGeralPage() {
   const [cursos, setCursos] = useState<Curso[]>([])
   const [estudantes, setEstudantes] = useState<Estudante[]>([])
   const [adminsCurso, setAdminsCurso] = useState<AdminCurso[]>([])
-  const [mensagem, setMensagem] = useState({ tipo: '', texto: '' })
+  const [mensagemAdmin, setMensagemAdmin] = useState({ tipo: '', texto: '' })
+
+  const [formDataMateria, setFormDataMateria] = useState({
+    nome: '',
+    curso_nome: '',
+    local: '',
+    professor_atual: '',
+    periodo: '',
+    carga_horaria: '',
+    horario: ''
+  })
+  const [mensagemMateria, setMensagemMateria] = useState({ tipo: '', texto: '' })
+  const [loadingMateria, setLoadingMateria] = useState(false)
 
   const buscarAdmins = async () => {
     try {
@@ -79,7 +92,7 @@ export default function AdminGeralPage() {
 
   const handlePromoverAdmin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setMensagem({ tipo: '', texto: '' })
+    setMensagemAdmin({ tipo: '', texto: '' })
     
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/usuario/promover-administrador-curso`, {
@@ -92,18 +105,67 @@ export default function AdminGeralPage() {
       })
 
       if (response.ok) {
-        setMensagem({ tipo: 'sucesso', texto: 'Administrador de curso adicionado com sucesso!' })
+        setMensagemAdmin({ tipo: 'sucesso', texto: 'Administrador de curso adicionado com sucesso!' })
         setEmailNovoAdmin('')
         setCursoSelecionado('')
         buscarAdmins()
       } else {
         const errorData = await response.json()
-        setMensagem({ tipo: 'erro', texto: errorData.error || 'Usuário não encontrado.' })
+        setMensagemAdmin({ tipo: 'erro', texto: errorData.error || 'Usuário não encontrado.' })
       }
     } catch (error) {
-      setMensagem({ tipo: 'erro', texto: 'Erro ao conectar com o servidor.' })
+      setMensagemAdmin({ tipo: 'erro', texto: 'Erro ao conectar com o servidor.' })
     }
   }
+
+  const handleMateriaInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormDataMateria(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCriarMateria = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMensagemMateria({ tipo: '', texto: '' });
+    setLoadingMateria(true);
+
+    if (Object.values(formDataMateria).some(field => field === '')) {
+      setMensagemMateria({ tipo: 'erro', texto: 'Por favor, preencha todos os campos obrigatórios.' });
+      setLoadingMateria(false);
+      return;
+    }
+
+    if (isNaN(Number(formDataMateria.carga_horaria)) || Number(formDataMateria.carga_horaria) <= 0) {
+      setMensagemMateria({ tipo: 'erro', texto: 'A carga horária deve ser um número válido.' });
+      setLoadingMateria(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/materias`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formDataMateria,
+          carga_horaria: Number(formDataMateria.carga_horaria)
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMensagemMateria({ tipo: 'sucesso', texto: 'Matéria cadastrada com sucesso!' });
+        setFormDataMateria({ nome: '', curso_nome: '', local: '', professor_atual: '', periodo: '', carga_horaria: '', horario: '' });
+      } else {
+        setMensagemMateria({ tipo: 'erro', texto: data.erro || 'Erro ao cadastrar matéria.' });
+      }
+    } catch (error) {
+      setMensagemMateria({ tipo: 'erro', texto: 'Erro ao conectar com o servidor.' });
+    } finally {
+      setLoadingMateria(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -136,6 +198,18 @@ export default function AdminGeralPage() {
           >
             <Users size={20} />
             Listar Administradores
+          </button>
+
+          <button 
+            onClick={() => setAbaAtiva('adicionar-materia')}
+            className={`flex items-center gap-3 w-full p-3 rounded-lg text-sm font-medium transition ${
+              abaAtiva === 'adicionar-materia' 
+                ? 'bg-indigo-800 border border-indigo-700/50 shadow-sm' 
+                : 'hover:bg-indigo-800/50 text-indigo-200 hover:text-white'
+            }`}
+          >
+            <BookOpen size={20} />
+            Adicionar Matéria
           </button>
         </nav>
       </aside>
@@ -215,13 +289,13 @@ export default function AdminGeralPage() {
                     Salvar Novo Administrador
                   </button>
 
-                  {mensagem.texto && (
+                  {mensagemAdmin.texto && (
                     <div className={`mt-4 p-4 rounded-xl text-center text-sm font-bold border ${
-                      mensagem.tipo === 'sucesso' 
+                      mensagemAdmin.tipo === 'sucesso' 
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
                         : 'bg-red-50 text-red-700 border-red-100'
                     }`}>
-                      {mensagem.texto}
+                      {mensagemAdmin.texto}
                     </div>
                   )}
                 </form>
@@ -273,6 +347,151 @@ export default function AdminGeralPage() {
                   </div>
                 )}
                 
+              </div>
+            </div>
+          )}
+
+          {/* ABA ADICIONAR MATÉRIA INTEGRADA */}
+          {abaAtiva === 'adicionar-materia' && (
+            <div className="w-full max-w-3xl mt-8">
+              <div className="text-center mb-10">
+                <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Adicionar Matéria</h1>
+                <p className="text-slate-500">Cadastre uma nova disciplina e disponibilize-a para a grade curricular dos estudantes do curso.</p>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 p-10">
+                <form onSubmit={handleCriarMateria} className="space-y-6">
+                  
+                  {/* Divisão em Grid para economizar espaço vertical */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    {/* Nome da Matéria - Ocupa 2 colunas */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Nome da Matéria *</label>
+                      <input 
+                        type="text" 
+                        name="nome"
+                        value={formDataMateria.nome}
+                        onChange={handleMateriaInputChange}
+                        placeholder="Ex: Banco de Dados I" 
+                        required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                    {/* Curso Vinculado - Ocupa 2 colunas */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Curso Vinculado *</label>
+                      <div className="relative">
+                        <select 
+                          name="curso_nome"
+                          value={formDataMateria.curso_nome}
+                          onChange={handleMateriaInputChange}
+                          required
+                          className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition appearance-none cursor-pointer"
+                        >
+                          <option value="">Selecione o curso...</option>
+                          {cursos.map(c => (
+                            <option key={c.nome} value={c.nome}>{c.nome}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <ChevronDown size={20} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Professor Atual */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Professor Atual *</label>
+                      <input 
+                        type="text" 
+                        name="professor_atual"
+                        value={formDataMateria.professor_atual}
+                        onChange={handleMateriaInputChange}
+                        placeholder="Nome do professor" 
+                        required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                    {/* Local */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Local (Sala/Prédio) *</label>
+                      <input 
+                        type="text" 
+                        name="local"
+                        value={formDataMateria.local}
+                        onChange={handleMateriaInputChange}
+                        placeholder="Ex: Sala 4.21 - Prédio CT" 
+                        required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                    {/* Período */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Período *</label>
+                      <input 
+                        type="text" 
+                        name="periodo"
+                        value={formDataMateria.periodo}
+                        onChange={handleMateriaInputChange}
+                        placeholder="Ex: 3º Período" 
+                        required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                    {/* Horário */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Horário *</label>
+                      <input 
+                        type="text" 
+                        name="horario"
+                        value={formDataMateria.horario}
+                        onChange={handleMateriaInputChange}
+                        placeholder="Ex: Terça e Quinta, 19h" 
+                        required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                    {/* Carga Horária - Ocupa 2 colunas */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Carga Horária (horas) *</label>
+                      <input 
+                        type="number" 
+                        name="carga_horaria"
+                        value={formDataMateria.carga_horaria}
+                        onChange={handleMateriaInputChange}
+                        placeholder="Ex: 72" 
+                        required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={loadingMateria}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 mt-4"
+                  >
+                    <BookOpen size={22} />
+                    {loadingMateria ? 'Salvando...' : 'Salvar Nova Matéria'}
+                  </button>
+
+                  {mensagemMateria.texto && (
+                    <div className={`mt-4 p-4 rounded-xl text-center text-sm font-bold border ${
+                      mensagemMateria.tipo === 'sucesso' 
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                        : 'bg-red-50 text-red-700 border-red-100'
+                    }`}>
+                      {mensagemMateria.texto}
+                    </div>
+                  )}
+                </form>
               </div>
             </div>
           )}
