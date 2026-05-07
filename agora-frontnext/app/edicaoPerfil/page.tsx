@@ -106,9 +106,33 @@ export default function EdicaoPerfil() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8 flex flex-col items-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Editar Perfil</h1>
+        <div className="min-h-screen bg-gray-50 p-8 flex flex-col items-center relative">
+            {/* Botão Voltar no canto superior esquerdo */}
+            <div className="absolute top-8 left-8">
+                <button 
+                    onClick={() => router.back()}
+                    className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-medium transition-colors group"
+                >
+                    <div className="p-2 rounded-full group-hover:bg-indigo-50 transition-colors">
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="20" 
+                            height="20" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2.5" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                        >
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                    </div>
+                    <span>Voltar</span>
+                </button>
+            </div>
 
+            <h1 className="text-2xl font-bold text-gray-800 mb-6 mt-4">Editar Perfil</h1>
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Foto de Perfil</label>
